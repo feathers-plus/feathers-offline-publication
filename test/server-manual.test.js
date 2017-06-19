@@ -6,16 +6,30 @@ const hooks = require('feathers-hooks');
 const socketio = require('feathers-socketio');
 
 const { clientConfigure, clientTest } = require('./helpers/client');
-const commonPublications = require('../src/commonPublications');
-const publicationServer = require('../src/server/configure');
+const serverConfigure = require('../src/server/configure');
 
-describe('server publication storage', () => {
+const publications = {
+  truthy: () => data => true,
+  falsey: () => data => false,
+};
+
+function services1 () {
+  const app = this;
+  app.configure(messages)
+}
+
+function messages () {
+  const app = this;
+  app.use('/messages', memory({}));
+}
+
+describe('server-manual', () => {
   let app;
   let server;
   let feathersClient;
   
   beforeEach(done => {
-    // configure Feathers on server
+    // configure server Feathers
     app = feathers()
       .configure(hooks())
       .configure(socketio())
@@ -26,9 +40,9 @@ describe('server publication storage', () => {
     server.on('listening', () => {
       
       // configure server publications support
-      publicationServer(app, commonPublications);
+      serverConfigure(app, publications);
   
-      // configure Feathers on client
+      // configure client Feathers
       feathersClient = clientConfigure();
       
       done();
@@ -42,12 +56,12 @@ describe('server publication storage', () => {
   it('adds publication', done => {
     // event signals end of processing
     feathersClient.io.on('_testing', data => {
-      
+  
       assert.deepEqual(data, {
         source: 'addPublication',
         serviceName: 'messages',
-        name: 'query',
-        params: { dept: 'acct' },
+        name: 'truthy',
+        params: [ 1, 2 ],
         ifServer: true,
         checkBefore: false,
         store: { ifServer: true, checkBefore: false }
@@ -55,32 +69,41 @@ describe('server publication storage', () => {
       
       done();
     });
-    
+  
     // run test function on client
-    const isInPublication = clientTest((feathersClient, publicationClient) => {
-      return publicationClient.addPublication(feathersClient, 'messages', {
-        module: commonPublications,
-        name: 'query',
-        params: { dept: 'acct' },
-        ifServer: true,
-        checkBefore: false,
+    clientTest(feathersClient => {
+      feathersClient.io.emit('add-publication', {
+        serviceName: 'messages', name: 'truthy', params: [1, 2], ifServer: true, checkBefore: false
       });
     });
+  });
+  
+  it('removes non-existent publication', done => {
+    // event signals end of processing
+    feathersClient.io.on('_testing', data => {
+  
+      assert.deepEqual(data, {
+        source: 'removePublication',
+        serviceName: 'messages',
+        keys: [],
+      });
+      
+      done();
+    });
     
-    // check filter function returned on client
-    assert.isFunction(isInPublication);
-    assert.isTrue(isInPublication({ dept: 'acct' }));
-    assert.isFalse(isInPublication({ dept: 'xacct' }));
+    // run test function on client
+    clientTest(feathersClient => {
+      feathersClient.io.emit('remove-publication', { serviceName: 'messages' });
+    });
   });
   
   it('removes publication', done => {
     // event signals end of processing
     feathersClient.io.on('_testing', data => {
-      
       if (data.source === 'addPublication') {
         // remove publication
-        clientTest((feathersClient, publicationClient) => {
-          return publicationClient.removePublication(feathersClient, 'messages');
+        clientTest(feathersClient => {
+          feathersClient.io.emit('remove-publication', { serviceName: 'messages' });
         });
       } else {
         assert.deepEqual(data, {
@@ -92,31 +115,17 @@ describe('server publication storage', () => {
         done();
       }
     });
-    
+
     // add publication
-    const isInPublication = clientTest((feathersClient, publicationClient) => {
-      return publicationClient.addPublication(feathersClient, 'messages', {
-        module: commonPublications,
-        name: 'query',
-        params: { dept: 'acct' },
-        ifServer: true,
-        checkBefore: false,
+    clientTest(feathersClient => {
+      feathersClient.io.emit('add-publication', {
+        serviceName: 'messages', name: 'truthy', params: [1, 2], ifServer: true, checkBefore: false
       });
     });
   });
 });
 
 // Helpers
-
-function services1 () {
-  const app = this;
-  app.configure(messages)
-}
-
-function messages () {
-  const app = this;
-  app.use('/messages', memory({}));
-}
 
 function clone (obj) {
   return JSON.parse(JSON.stringify(obj));

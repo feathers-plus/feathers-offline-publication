@@ -1,5 +1,5 @@
 
-const { stripSlashes } = require('feathers-commons/lib/utils');
+import { stripSlashes } from 'feathers-commons/lib/utils';
 import makeDebug from 'debug';
 
 const debug = makeDebug('pub-client');
@@ -37,7 +37,7 @@ export function addPublication(app, serviceName, publication) {
     throw new Error('checkBefore must be a boolean. (offline-publication)');
   }
   
-  const isInPublication = module[name](...(Array.isArray(params) ? params : [params]));
+  const filter = module[name](...(Array.isArray(params) ? params : [params]));
   
   if (socket && publication && ifServer) {
     const data = Object.assign({}, publication, { serviceName: stripSlashes(serviceName) });
@@ -47,7 +47,7 @@ export function addPublication(app, serviceName, publication) {
     socket.emit('add-publication', data);
   }
   
-  return isInPublication;
+  return filter;
 }
 
 export function removePublication(app, serviceName) {

@@ -1,7 +1,7 @@
 
-const sift = require('sift');
+import sift from 'sift';
 
-module.exports = {
+export default {
   query (query) {
     const sifter = sift(query);
 

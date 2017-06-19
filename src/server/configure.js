@@ -1,5 +1,7 @@
 
-const debug = require('debug')('pub-configure-server');
+import makeDebug from 'debug';
+
+const debug = makeDebug('pub-server');
 
 export default function publication (app, publications, extraEvents = {}) {
   debug('Configure publications start.');
@@ -44,13 +46,14 @@ function addPublication ({ socket, namespace, publications, getFeathersStore, se
   return ({ serviceName, name, params, ifServer, checkBefore }) => {
     debug('addPublication start', serviceName, name, params);
     const feathersStore = getFeathersStore(socket);
+    params = Array.isArray(params) ? params : [params];
 
     if (!feathersStore[namespace]) {
       feathersStore[namespace] = {};
     }
 
     const store = feathersStore[namespace][serviceName] = Object.assign({},
-      { isInPublication: publications[name](...(params || [])) },
+      { filter: publications[name](...(params || [])) },
       ifServer !== undefined ? { ifServer } : {},
       checkBefore !== undefined ? { checkBefore } : {}
     );

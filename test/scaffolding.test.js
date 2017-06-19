@@ -17,7 +17,7 @@ function messages () {
   app.use('/messages', memory({}));
 }
 
-describe('check test scaffolding', () => {
+describe('scaffolding', () => {
   let app;
   let server;
   let connection;
