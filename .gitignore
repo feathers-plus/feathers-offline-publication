@@ -32,5 +32,9 @@ node_modules
 # The compiled/babelified modules
 lib/
 
-# Editors
+## WebStorm editor
 .idea/
+
+.idea/misc.xml
+
+.idea/workspace.xml

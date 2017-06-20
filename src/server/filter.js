@@ -9,9 +9,12 @@ export default function filter (serviceName) {
     const _publications_ = connection._publications_;
     const before = hook.params.before;
 
-    debug('--- filter', hook.method);
-    debug('from', before || '');
+    debug('.filter', hook.method);
+    debug('from', before);
     debug('to  ', data);
+    
+    // Leave if previous filter rejected the event
+    if (typeof data !== 'object') { return data; }
 
     // Leave if no publication exists
     if (!_publications_ || !_publications_[serviceName]) {
