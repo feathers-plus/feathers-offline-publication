@@ -12,7 +12,7 @@ export default function filter (serviceName) {
     debug('.filter', hook.method);
     debug('from', before);
     debug('to  ', data);
-    
+
     // Leave if previous filter rejected the event
     if (typeof data !== 'object') { return data; }
 

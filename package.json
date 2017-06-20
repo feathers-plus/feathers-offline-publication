@@ -1,6 +1,6 @@
 {
   "name": "feathers-offline-publication",
-  "description": "Publications allow clients to specify the server's service filters. This minimizes the events received by the client.",
+  "description": "Use dynamic publications to minimize the number of service events received by the client.",
   "version": "0.0.0",
   "homepage": "https://github.com/feathersjs/feathers-offline-publication",
   "main": "lib/",

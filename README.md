@@ -6,36 +6,40 @@
 [![Dependency Status](https://img.shields.io/david/feathersjs/feathers-offline-publication.svg?style=flat-square)](https://david-dm.org/feathersjs/feathers-offline-publication)
 [![Download Status](https://img.shields.io/npm/dm/feathers-offline-publication.svg?style=flat-square)](https://www.npmjs.com/package/feathers-offline-publication)
 
-> Use "publications" in Feathers service filters to minimize events emitted to clients. Also use on client.
+> Use dynamic "publications" to minimize the number of service events received by the client.
 
 
 ## Publications
 
 `publications` are objects containing multiple `publication` functions.
-The functions determine if a record belongs in the publication or not.
+These functions determine if a record belongs in the publication or not.
 A sample publications is:
 ```javascript
 const publications = {
-  username: username => data => !!data.username,
-  active: () => data => !!data.deleted,
+  username: username => data => data.username === username,
+  active: () => data => !data.deleted,
 };
 ```
 
 The publication `publications.usersname('john')` selects all records whose `username` is `john`;
 `publications.active()` selects all logically active records.
+
 The builtin `commonPublications.query({ username: 'john' })` selects records based on the
 [query syntax used by MongoDB](https://docs.mongodb.com/manual/reference/operator/query/).
 
 
 ## Minimize service events
 
-Once a client associates a Feathers service with a
-publications object, a publication function name, and params for that function,
-then that client will be sent only service events relevant to that publication.
+Once a client associates a Feathers service with
+- a publications object,
+- a publication function name, and
+- params for that function,
+
+then that client will only be sent service events relevant to that publication.
 This may improve performance, especially for mobile devices, as the bandwidth consumed by the client
 is reduced.
 
-You can stash the current value of record into `context.params.before`, before mutating it, with:
+You can stash the current value of a record inside the hook object, before mutating it, with:
 ```javascript
 module.exports = {
   before: {
@@ -46,8 +50,8 @@ module.exports = {
 };
 ```
 
-The client will receive a service event is either the previous (stashed) value of the record,
-or the new value is in the publication.
+The client will receive a service event if either the previous (stashed) value of the record,
+or the new value is within the publication.
 This double check informs the client of records which previously belonged to the publication,
 but no longer do so after the mutation.
 
@@ -93,8 +97,19 @@ console.log(selector({ username: 'john' })); // true
 console.log(selector({ username: 'jack' })); // false
 ```
 
-Note than the same `publications` object is required both on the server and the client.
+Note that the same `publications` object must be provided both on the server and the client.
 Also note the client may use the resultant selector function.
+
+
+## Security
+
+An attacker may modify the `clientPublications.addPublication` call on the client
+or issue one of their own.
+
+Feathers supports multiple service events filters for a method,
+and a mutation must satisfy them all before being emitted to the client.
+You can therefore add filters both before and after the `serverPublications` call
+to establish any additional security you need.
 
 
 ## Installation
@@ -131,9 +146,8 @@ __Options:__
     The same object must be used in `serverPublications`.
     - `name` (*required*, string) - The prop name of the publication in `module`.
     - `params` (*optional*, any or array of any) - The parameters to call `name` with.
-    - `ifServer` (*optional, boolean, default true) - If false,
-    the server will do not filtering,
-    but the selector function is still returned to the client.
+    - `ifServer` (*optional*, boolean, default true) - If false,
+    no server publication is created, but the selector function is still returned to the client.
 
 ### `clientPublications.removePublication(clientApp, serviceName)`
 
@@ -145,6 +159,23 @@ __Options:__
 
 - `clientApp` (*required*) - The Feathers client app.
 - `serviceName` (*required*, string) - The service name whose publication is being removed.
+
+### `commonPublications.query(selection)`
+
+A publication which selects records based on the
+[query syntax used by MongoDB](https://docs.mongodb.com/manual/reference/operator/query/).
+
+__Options:__
+
+- `selection` (*required*) - The [query object](https://github.com/crcn/sift.js).
+    - Supported operators: $in, $nin, $exists, $gte, $gt, $lte, $lt, $eq, $ne, $mod, $all, $and,
+    $or, $nor, $not, $size, $type, $regex, $where, $elemMatch
+    - Regexp searches
+    - Function filtering
+    - sub object searching
+    - dot notation searching
+    - Custom Expressions
+    - filtering of immutable data structures
 
 ## License
 
