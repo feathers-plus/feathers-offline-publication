@@ -7,7 +7,7 @@ const debug = makeDebug('pub-client');
 export function addPublication(app, serviceName, publication) {
   debug('addPublication', serviceName);
   const socket = app.io || app.primus;
-  const { module, name, params, ifServer = false, checkBefore = false } = publication;
+  const { module, name, params, ifServer = true } = publication;
   
   if (!serviceName || typeof serviceName !== 'string') {
     throw new Error(`No service name provided. (offline-publication)`);
@@ -33,15 +33,12 @@ export function addPublication(app, serviceName, publication) {
     throw new Error('ifServer must be a boolean. (offline-publication)');
   }
   
-  if (typeof checkBefore !== 'boolean') {
-    throw new Error('checkBefore must be a boolean. (offline-publication)');
-  }
-  
   const filter = module[name](...(Array.isArray(params) ? params : [params]));
   
   if (socket && publication && ifServer) {
     const data = Object.assign({}, publication, { serviceName: stripSlashes(serviceName) });
     delete data.module;
+    delete data.ifServer;
   
     debug('emit add-publication', data);
     socket.emit('add-publication', data);

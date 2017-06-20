@@ -48,9 +48,8 @@ describe('integration', () => {
         serviceName: 'messages',
         name: 'query',
         params: [{ dept: 'acct' }],
-        ifServer: true,
-        checkBefore: false,
-        store: { ifServer: true, checkBefore: false }
+        store: {},
+        filter: 'function',
       });
       
       done();
@@ -62,8 +61,6 @@ describe('integration', () => {
         module: commonPublications,
         name: 'query',
         params: { dept: 'acct' },
-        ifServer: true,
-        checkBefore: false,
       });
     });
     
@@ -94,43 +91,37 @@ describe('integration', () => {
     });
     
     // add publication
-    const filter = clientTest((feathersClient, publicationClient) => {
+    clientTest((feathersClient, publicationClient) => {
       return publicationClient.addPublication(feathersClient, 'messages', {
         module: commonPublications,
         name: 'query',
         params: { dept: 'acct' },
-        ifServer: true,
-        checkBefore: false,
       });
     });
   });
 
   it('filters mutations', done => {
-    const messages = app.service('messages');
-    let eventCount = 1;
-    
-    // event signals end of processing
-    feathersClient.io.on('_testing', data => {
-      messages.create({ name: 'john', dept: 'acct' })
+    // event signals end of publication processing
+    feathersClient.io.on('_testing', () => {
+      app.service('messages').create({ name: 'nick', dept: 'xacct' }) // filter ignores
         .then(() => {
-         
+          app.service('messages').create({ name: 'john', dept: 'acct' }); // filter accepts
         });
     });
-    
+  
+    // event signals end of test
     feathersClient.service('messages').on('created', data => {
-      console.log('>>>created');
-      console.log(data);
+      assert.equal(data.dept, 'acct');
+      
       done();
     });
     
     // run test function on client
-    const filter = clientTest((feathersClient, publicationClient) => {
+    clientTest((feathersClient, publicationClient) => {
       return publicationClient.addPublication(feathersClient, 'messages', {
         module: commonPublications,
         name: 'query',
         params: { dept: 'acct' },
-        ifServer: true,
-        checkBefore: false,
       });
     });
   });

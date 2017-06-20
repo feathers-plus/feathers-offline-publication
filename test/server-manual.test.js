@@ -62,9 +62,8 @@ describe('server-manual', () => {
         serviceName: 'messages',
         name: 'truthy',
         params: [ 1, 2 ],
-        ifServer: true,
-        checkBefore: false,
-        store: { ifServer: true, checkBefore: false }
+        store: {},
+        filter: 'function',
       });
       
       done();
@@ -73,7 +72,7 @@ describe('server-manual', () => {
     // run test function on client
     clientTest(feathersClient => {
       feathersClient.io.emit('add-publication', {
-        serviceName: 'messages', name: 'truthy', params: [1, 2], ifServer: true, checkBefore: false
+        serviceName: 'messages', name: 'truthy', params: [1, 2]
       });
     });
   });
@@ -119,7 +118,7 @@ describe('server-manual', () => {
     // add publication
     clientTest(feathersClient => {
       feathersClient.io.emit('add-publication', {
-        serviceName: 'messages', name: 'truthy', params: [1, 2], ifServer: true, checkBefore: false
+        serviceName: 'messages', name: 'truthy', params: [1, 2]
       });
     });
   });

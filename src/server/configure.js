@@ -43,7 +43,7 @@ export default function publication (app, publications, extraEvents = {}) {
 function addPublication ({ socket, namespace, publications, getFeathersStore, setFeathersStore }) {
   debug('addPublication construct');
 
-  return ({ serviceName, name, params, ifServer, checkBefore }) => {
+  return ({ serviceName, name, params }) => {
     debug('addPublication start', serviceName, name, params);
     const feathersStore = getFeathersStore(socket);
     params = Array.isArray(params) ? params : [params];
@@ -52,16 +52,13 @@ function addPublication ({ socket, namespace, publications, getFeathersStore, se
       feathersStore[namespace] = {};
     }
 
-    const store = feathersStore[namespace][serviceName] = Object.assign({},
-      { filter: publications[name](...(params || [])) },
-      ifServer !== undefined ? { ifServer } : {},
-      checkBefore !== undefined ? { checkBefore } : {}
-    );
+    const store = feathersStore[namespace][serviceName] =
+      Object.assign({}, { filter: publications[name](...(params || [])) });
 
     setFeathersStore(socket, feathersStore);
 
     socket.emit('_testing', { // needed for test
-      source: 'addPublication', serviceName, name, params, ifServer, checkBefore, store
+      source: 'addPublication', serviceName, name, params, store, filter: typeof store.filter
     });
 
     debug('addPublication end', store);

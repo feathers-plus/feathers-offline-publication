@@ -13,13 +13,14 @@ export default function filter (serviceName) {
     debug('from', _before || '');
     debug('to  ', data);
 
-    // Leave if no publication exists or if the publication is not to run on the server
-    if (!_publications_ || !_publications_[serviceName] || !_publications_[serviceName].ifServer) {
+    // Leave if no publication exists
+    if (!_publications_ || !_publications_[serviceName]) {
       debug('NEED, as no filter');
       return data;
     }
 
-    const ifBeforeNeeded = _before ? _publications_[serviceName].filter(_before) : false;
+    // Check pre-mutated record if it is stashed in hook.params.before
+    const ifBeforeNeeded = before ? _publications_[serviceName].filter(before) : false;
     const ifAfterNeeded = _publications_[serviceName].filter(data);
 
     debug(`Service filter end. before ${ifBeforeNeeded}. after ${ifAfterNeeded}`);

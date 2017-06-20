@@ -48,9 +48,8 @@ describe('client-publication', () => {
         serviceName: 'messages',
         name: 'query',
         params: [{ dept: 'acct' }],
-        ifServer: true,
-        checkBefore: false,
-        store: { ifServer: true, checkBefore: false }
+        store: {},
+        filter: 'function',
       });
       
       done();
@@ -62,8 +61,6 @@ describe('client-publication', () => {
         module: commonPublications,
         name: 'query',
         params: { dept: 'acct' },
-        ifServer: true,
-        checkBefore: false,
       });
     });
     
@@ -71,6 +68,30 @@ describe('client-publication', () => {
     assert.isFunction(filter);
     assert.isTrue(filter({ dept: 'acct' }));
     assert.isFalse(filter({ dept: 'xacct' }));
+  });
+  
+  it('does not add publication when ifServer false', done => {
+    // event signals end of processing
+    feathersClient.io.on('_testing', () => {
+      assert(false, 'Unexpected event');
+    });
+    
+    // run test function on client
+    const filter = clientTest((feathersClient, publicationClient) => {
+      return publicationClient.addPublication(feathersClient, 'messages', {
+        module: commonPublications,
+        name: 'query',
+        params: { dept: 'acct' },
+        ifServer: false,
+      });
+    });
+    
+    // check filter function returned on client
+    assert.isFunction(filter);
+    assert.isTrue(filter({ dept: 'acct' }));
+    assert.isFalse(filter({ dept: 'xacct' }));
+    
+    setTimeout(() => { done(); }, 200);
   });
   
   it('removes publication', done => {
