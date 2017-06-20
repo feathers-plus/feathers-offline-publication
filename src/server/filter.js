@@ -7,10 +7,10 @@ export default function filter (serviceName) {
   return (data, connection, hook) => {
     debug(`Service filter for ${serviceName} start`);
     const _publications_ = connection._publications_;
-    const _before = hook.params._before;
+    const before = hook.params.before;
 
     debug('--- filter', hook.method);
-    debug('from', _before || '');
+    debug('from', before || '');
     debug('to  ', data);
 
     // Leave if no publication exists
