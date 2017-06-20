@@ -21,7 +21,7 @@ const publications = {
 };
 ```
 
-The publication `publications.usersname('john')` selects all records whose `username` is `john`;
+The publication `publications.username('john')` selects all records whose `username` is `john`;
 `publications.active()` selects all logically active records.
 
 The builtin `commonPublications.query({ username: 'john' })` selects records based on the
