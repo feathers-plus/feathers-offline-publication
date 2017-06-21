@@ -14,7 +14,7 @@ export default function filter (serviceName) {
     debug('to  ', data);
 
     // Leave if previous filter rejected the event
-    if (typeof data !== 'object') { return data; }
+    if (typeof data !== 'object' || data === null) { return data; }
 
     // Leave if no publication exists
     if (!_publications_ || !_publications_[serviceName]) {
