@@ -55,7 +55,17 @@ or the new value is within the publication.
 This double check informs the client of records which previously belonged to the publication,
 but no longer do so after the mutation.
 
-You can eliminate the check of the previous value by not running the `stashBefore` hook.
+## When records remain in the same publication
+
+Its not uncommon, for example, for mobile apps to have unique data per user.
+Each service model has a `username` field and, once that field is set on `create`, it never changes.
+
+The client would use a publication such as the `publications.username('john')` from above
+to select only the records for its user.
+
+There is no need in this case to check the previous (stashed) value of the record,
+and you can eliminate doing so by not running the `stashBefore` hook.
+This would also marginally improve performance since `stashBefore` makes a `get` call.
 
 
 ## Example
