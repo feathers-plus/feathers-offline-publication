@@ -118,6 +118,7 @@ to establish any additional security you need.
 npm install feathers-offline-publication --save
 ```
 
+
 ## Documentation
 
 ### `serverPublications(app, publications, ...serviceNames)`
