@@ -66,6 +66,7 @@
     "feathers-hooks": "^2.0.1",
     "feathers-hooks-common": "^3.5.3",
     "feathers-memory": "^1.1.0",
+    "feathers-socketio": "^2.0.0",
     "istanbul": "1.1.0-alpha.1",
     "mocha": "^3.4.2",
     "semistandard": "^11.0.0",
