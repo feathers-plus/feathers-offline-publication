@@ -1,7 +1,7 @@
 {
   "name": "feathers-offline-publication",
   "description": "Use dynamic publications to minimize the number of service events received by the client.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "homepage": "https://github.com/feathersjs/feathers-offline-publication",
   "main": "lib/",
   "keywords": [
