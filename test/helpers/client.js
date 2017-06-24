@@ -32,8 +32,5 @@ function clientConfigure () {
 function clientTest (test) {
   debug('clientTest start');
 
-  const x = test(feathersClient, publicationClient);
-
-  debug('clientTest end', typeof x);
-  return x;
+  return test(feathersClient, publicationClient);
 }
