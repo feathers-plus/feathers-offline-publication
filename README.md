@@ -161,6 +161,13 @@ __Options:__
     - `params` (*optional*, any or array of any) - The parameters to call `name` with.
     - `ifServer` (*optional*, boolean, default true) - If false,
     no server publication is created, but the selector function is still returned to the client.
+    
+> **ProTip:** You can find useful publications in
+[`feathers-offline-publication/commonPublications`](https://github.com/feathersjs/feathers-offline-publication/blob/master/src/common-publications.js).
+
+> **ProTip:** You can merge the commonPublications with your own ones using
+`Object.assign({}, commonPublications, nyCustomPublications)`.
+
 
 ### `clientPublications.removePublication(clientApp, serviceName)`
 
