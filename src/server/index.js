@@ -6,8 +6,9 @@ import makeDebug from 'debug';
 
 const debug = makeDebug('pub-filter');
 
-export default function serverPublications (app, publications, ...serviceNames) {
+export default function serverPublications (app, publications, serviceNames) {
   debug('publicationFilters start');
+  serviceNames = Array.isArray(serviceNames) ? serviceNames : [serviceNames];
 
   serviceNames.forEach(serviceName => {
     debug(`Set filters for ${serviceName}`);
