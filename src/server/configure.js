@@ -16,11 +16,13 @@ export default function publication (app, publications, extraEvents = {}) {
     socketHandler = 'io';
     getFeathersStore = socket => socket.feathers;
     setFeathersStore = (socket, data) => { socket.feathers = data; };
-  } else {
+  } else if (app.primus) {
     debug('primus');
     socketHandler = 'primus';
     getFeathersStore = socket => socket.request.feathers;
     setFeathersStore = (socket, data) => { socket.request.feathers = data; };
+  } else {
+    throw new Error('WebSocket is not configured or server is not listening yet. (publication)');
   }
 
   app[socketHandler].on('connection', socket => {
